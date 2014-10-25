@@ -8,13 +8,16 @@
     "https://secure.flickr.com/",
     "tabs"
   ],
+  "background" : {
+    "scripts" : ["main.js"]
+  },
   "browser_action": {
     "default_icon": "lock.png",
     "default_popup": "popup.html"
   },
   "content_scripts" : [{
     "matches" : ["*://*/*"],
-    "js" : ["jquery.min.js", "sha256.js", "hidden.js", "changePassword.js"],
+    "js" : ["jquery.min.js", "detectSelector.js"],
     "css" : ["style.css"],
     "all_frames" : true
   }]
