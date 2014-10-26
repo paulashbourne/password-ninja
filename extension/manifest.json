@@ -11,6 +11,7 @@
     "scripts" : [
       "lib/jquery.min.js",
       "lib/underscore.js",
+      "lib/password-ninja.js",
       "background.js"
     ]
   },

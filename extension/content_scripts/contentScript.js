@@ -16,6 +16,9 @@ var PasswordNinjaContentScript = function(port) {
       $(document).on('click', '*', _.bind(this.showTooltip, this));
     },
     messageListener : function(msg) {
+      if (typeof msg.sessionid != "undefined") {
+        this.sessionid = msg.sessionid;
+      }
       if (typeof msg.command != "undefined") {
         this[msg.command]();
       } else {
@@ -25,12 +28,15 @@ var PasswordNinjaContentScript = function(port) {
     messageBackground : function(msg) {
       msg.destination = "background";
       msg.sender = "content";
+      if (typeof this.sessionid != "undefined") {
+        msg.sessionid = this.sessionid;
+      }
       this.port.postMessage(msg);
     },
     showTooltip : function(evt) {
       evt.preventDefault();
       evt.stopPropagation();
-      $el = $(evt.currentTarget);
+      var $el = $(evt.currentTarget);
       if ($el.parents('.password-ninja').length > 0) {
         // element is already a password ninja element
         return;
@@ -48,8 +54,15 @@ var PasswordNinjaContentScript = function(port) {
       }
       dropdown += '</ul></div>';
       var $dropdown = $(dropdown);
-      $dropdown.find('li').click(_.bind(function(evt) {
-
+      $dropdown.find('li').on('click', _.bind(function(evt) {
+        evt.preventDefault();
+        var selector = this.detectSelector($el);
+        var action = $(evt.currentTarget).attr('data-action');
+        this.messageBackground({
+          'type' : 'userAction',
+          'data' : {'action' : action, 'selector' : selector}
+        });
+        $('.password-ninja').remove();
       }, this));
       var $container = $('<span class="password-ninja"></span>');
       $dropdown.hide();
@@ -64,7 +77,6 @@ var PasswordNinjaContentScript = function(port) {
       var selectorUnique = function(selector) {
         return $(selector).length === 1;
       }
-      var $el = $(evt.currentTarget);
       var selector = $el.prop("tagName");
       var id = $el.prop('id')
       if (id != null && id != "") {
@@ -77,6 +89,9 @@ var PasswordNinjaContentScript = function(port) {
       var name = $el.prop("name");
       if (name != null && name != "") {
         selector += '[name="' + name + '"]';
+      }
+      if (selectorUnique(selector)) {
+        return selector;
       }
       // add first class if exists
       var classes = $el.prop('class');

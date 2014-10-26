@@ -1,0 +1,69 @@
+body {
+  margin: 0px;
+  font-family: "Lucida Grande", arial, sans-serif;
+  background-size: 150px auto;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.popupContainer {
+  padding: 5px;    
+  color: #434343;    
+}
+.buttonRow {
+/*             border-bottom: 1px solid #eee; */
+}
+.rowTitle {
+/*                 border-bottom: 1px solid #ccc; */
+}
+.rowTitle > p {
+  font-size: 15px;
+  margin: .3em .25em;
+}
+.rowContainer {
+
+}
+.popupButton {
+  display: block;
+  text-decoration: none;
+  padding: 5px;
+  width: 250px;
+/* border-radius: 5px; */
+  color: #333;
+  background: none;
+  font-size: 14px;
+/* border-bottom: 1px solid #eee; */
+}
+.popupButton:hover {
+  text-decoration: none;
+  background-color: rgba(200,200,200,0.2);
+}
+.popupButton:focus, .popupButton:active {
+  outline: 0px;
+}
+.popupButton > img {
+  height: 20px;
+  width: auto;
+  margin-right: 10px;
+  position:relative;
+  top:2px;
+}
+.popupButton > span{
+  display:inline-block;
+  position: relative;
+  top: -3px;
+}                        
+span.icon-wrapper {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+}
+.icon-wrapper > .fa{
+  color: #419ab1;
+}
+.divider{
+border-bottom: 1px solid #ddd;
+}   
+#webAppButtons, .divider{
+padding-bottom: 3px;
+margin-bottom: 3px;
+} 
