@@ -1,3 +1,6 @@
+/*
+ * Automatically detects the login form if present on any given web page
+ */
 //$(document).on('focus', 'input[type="password"]', documentModified);
 $(document).on('focus', 'input[type="password"]', checkForLogin);
 checkForLogin();

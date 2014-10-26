@@ -1,24 +1,33 @@
 {
-  "manifest_version": 2,
-  "name": "PasswordNinja",
-  "description": "Allows you to securely use a single password for all websites.",
-  "version": "1.0",
+  "manifest_version" : 2,
+  "name" : "PasswordNinja",
+  "description" : "Allows you to securely use a single password for all websites.",
+  "version" : "1.0",
 
   "permissions": [
-    "https://secure.flickr.com/",
     "tabs"
   ],
   "background" : {
-    "scripts" : ["main.js"]
+    "scripts" : [
+      "lib/jquery.min.js",
+      "lib/underscore.js",
+      "background.js"
+    ]
   },
-  "browser_action": {
-    "default_icon": "lock.png",
-    "default_popup": "popup.html"
+  "browser_action" : {
+    "default_icon" : "popup/lock.png",
+    "default_popup" : "popup/popup.html"
   },
   "content_scripts" : [{
     "matches" : ["*://*/*"],
-    "js" : ["jquery.min.js", "detectSelector.js"],
-    "css" : ["style.css"],
+    "js" : [
+      "lib/jquery.min.js",
+      "lib/underscore.js",
+      "content_scripts/contentScript.js"
+    ],
+    "css" : [
+      "content_scripts/style.css"
+    ],
     "all_frames" : true
   }]
 }
