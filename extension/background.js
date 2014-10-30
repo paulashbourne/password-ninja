@@ -1,85 +1,135 @@
 var BackgroundPage = function() {
   var obj = {
     initialize : function() {
-      this.popupSessions = {}; //key is tab id
-      this.contentSessions = {};
+      this.tabs = {};
       //setup port listeners
       chrome.runtime.onConnect.addListener(_.bind(function(port) {
-        if (port.name.indexOf("popup") == 0) {
-          var tabid = parseInt(port.name.substring(6));
-          if (!(tabid in this.popupSessions)) {
-            this.popupSessions[tabid] = {
-              'tabid'     : tabid,
-              'sessionid' : null
-            };
-          }
-          this.popupSessions[tabid].port = port;
-          var sessionid = this.popupSessions[tabid].sessionid;
-          if (sessionid !== null) {
-            if (this.contentSessions[sessionid].type == 'learnChangePassword') {
-              //message browser port back with sessionid
-              port.postMessage({
-                'command'   : 'learnChangePasswordStarted',
-                'data' : {
-                  'sessionid' : sessionid
-                }
-              });
-            }
-          }
-          port.onMessage.addListener(_.bind(this.portListener(tabid), this));
+        if (port.name == "content") {
+          var tabid = port.sender.tab.id;
+          this.initContentScript(tabid, port);
+          port.onMessage.addListener(_.bind(this.portListener(tabid, port.name), this));
+        } else if (port.name == "popup") {
+          chrome.tabs.query({
+            'active'        : true,
+            'currentWindow' : true
+          }, _.bind(function(tabs) {
+            var tabid = tabs[0].id;
+            this.initPopupScript(tabid, port);
+            port.onMessage.addListener(_.bind(this.portListener(tabid, port.name), this));
+          }, this));
         }
       }, this));
     },
-    portListener : function(tabid) {
-      return function(msg) {
-        this.handleMessage(tabid, msg);
-        console.log(msg);
+    initTab : function(tabid) {
+      if (!(tabid in this.tabs)) {
+        this.tabs[tabid] = {
+          'state' : 'default',
+          'ports' : {},
+          'instructions' : [],
+        }
       }
     },
-    handleMessage : function(tabid, msg) {
-      if (msg.msg == "startLearnChangePassword") {
-        this.startLearnChangePassword(tabid);
-      } else if (msg.msg == "doneLearning") {
-        this.doneLearning(tabid);
+    initPopupScript : function(tabid, port) {
+      this.initTab(tabid);
+      this.tabs[tabid].ports.popup = port;
+      var state = this.tabs[tabid].state;
+      if (state == "default") {
+        port.postMessage({
+          "command" : "setOptions",
+          "data"    : {
+            "options" : [
+              {'value' : 'learnLogin',
+              'text'  : 'Learn Login'},
+              {'value' : 'learnPasswordChange',
+              'text'  : 'Learn Password Change'},
+              {'value' : 'doLogin',
+              'text'  : 'Do Login'},
+              {'value' : 'doPasswordChange',
+              'text'  : 'Do Password Change'},
+            ]
+          }
+        });
+      } else if (state == "learnPasswordChange") {
+        port.postMessage({
+          "command" : "setOptions",
+          "data"    : {
+            "options" : [
+              {'value' : 'doneLearning',
+              'text'  : 'Done Learning'}
+            ]
+          }
+        });
+      } else if (state == "learnLogin") {
+        port.postMessage({
+          "command" : "setOptions",
+          "data"    : {
+            "options" : [
+              {'value' : 'doneLearning',
+              'text'  : 'Done Learning'}
+            ]
+          }
+        });
       }
     },
-    handleContentMessage : function(msg) {
+    initContentScript : function(tabid, port) {
+      this.initTab(tabid);
+      if (typeof port != "undefined") {
+        this.tabs[tabid].ports.content = port;
+      }
+      var state = this.tabs[tabid].state;
+      if (state == "default") {
+      } else if (state == "learnPasswordChange") {
+        this.tabs[tabid].ports.content.postMessage({
+          "command" : "learnPasswordChange",
+        });
+      }
+    },
+    portListener : function(tabid, type) {
+      if (type == "popup") {
+        return function(msg) {
+          this.handlePopupMessage(tabid, msg);
+        }
+      } else {
+        return function(msg) {
+          this.handleContentMessage(tabid, msg);
+        }
+      }
+    },
+    handlePopupMessage : function(tabid, msg) {
+      if (typeof msg.menuOption != "undefined" && 
+          this.popupFunctions.indexOf(msg.menuOption) != -1) {
+        this[msg.menuOption](tabid);
+      }
+      console.log(msg);
+    },
+    handleContentMessage : function(tabid, msg) {
       if (msg.type === 'userAction') {
-        this.contentSessions[msg.sessionid].instructions.push(msg.data);
+        this.tabs[tabid].instructions.push(msg.data);
       }
+      console.log(msg);
     },
     getActiveTab : function(callback) {
-      chrome.tabs.query({
-        'active'        : true,
-        'currentWindow' : true
-      }, _.bind(function(tabs) {
-        callback(tabs[0]);
-      }, this));
     },
-    startLearnChangePassword : function(tabid) {
-      //generate random sessionid
-      var sessionid = PasswordNinjaLib.getRandomString(10);
-      while (sessionid in this.contentSessions) {
-        sessionid = PasswordNinjaLib.getRandomString(10);
+    popupFunctions : [
+      "learnPasswordChange"
+    ],
+    learnPasswordChange : function(tabid) {
+      if (!("content" in this.tabs[tabid].ports)) {
+        return false; //error
       }
-      var contentPort = chrome.tabs.connect(tabid);
-      this.contentSessions[sessionid] = {
-        'tabid'        : tabid,
-        'contentPort'  : contentPort,
-        'type'         : 'learnChangePassword',
-        'instructions' : []
-      };
-      this.popupSessions[tabid].sessionid = sessionid;
-      contentPort.onMessage.addListener(_.bind(function(msg) {
-        this.handleContentMessage(msg);
-      }, this));
-      contentPort.postMessage({
-        'command'   : 'startCapture',
-        'sessionid' : sessionid
-      });
+      this.tabs[tabid].state = "learnPasswordChange";
+      this.initContentScript(tabid);
     },
+    doPasswordChange : function(tabid) {
+      if (!("content" in this.tabs[tabid].ports)) {
+        return false; //error
+      }
+      this.tabs[tabid].state = "doPasswordChange";
+      this.initContentScript(tabid);
+    }
     doneLearning : function(tabid) {
-      console.log(this);
+      this.tabs[tabid].state = "default";
+      this.initContentScript(tabid);
     }
   };
   obj.initialize();

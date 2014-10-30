@@ -1,36 +1,59 @@
-var PasswordNinjaContentScript = function(port) {
+var PasswordNinjaContentScript = function() {
+  /*
+   * Has to be able to:
+   * -Learn Login
+   * -Learn Password Change
+   * -Auto-Login
+   * -Auto-Password Change
+   */
   var obj = {
-    tooltipOptions : {
-      'username' : 'Enter Username/Email',
-      'password' : 'Enter Password',
-      'new-password' : 'Enter New Password',
-      'old-password' : 'Enter Old Password',
-      'click' : 'Click!'
-    },
-    initialize : function(port) {
+    initialize : function() {
        //setup message port with background page
-       this.port = port;
+       this.port = chrome.runtime.connect({'name' : 'content'})
        this.port.onMessage.addListener(_.bind(this.messageListener, this));
     },
-    startCapture  : function() {
-      $(document).on('click', '*', _.bind(this.showTooltip, this));
+    setData : function(data)  {
+      //used to set variable values
+      $.extend(true, this, data);
+    },
+    disableListeners : function() {
+      $(document).off('click.password-ninja', '*');
+    },
+    resetListeners : function() {
+      $(document).off('click.password-ninja', '*');
+      $(document).on('click.password-ninja', '*',
+          _.bind(this.showTooltip, this));
+    },
+    learnPasswordChange : function() {
+      this.tooltipOptions = {
+        'username' : 'Enter Username/Email',
+        'new-password' : 'Enter New Password',
+        'old-password' : 'Enter Old Password',
+        'click' : 'Click!'
+      };
+      this.resetListeners();
+    },
+    learnLogin : function() {
+      this.tooltipOptions = {
+        'username' : 'Enter Username/Email',
+        'password' : 'Enter Password',
+        'click' : 'Click!'
+      };
+      this.resetListeners();
+    },
+    doInstruction : function(data) {
     },
     messageListener : function(msg) {
-      if (typeof msg.sessionid != "undefined") {
-        this.sessionid = msg.sessionid;
-      }
       if (typeof msg.command != "undefined") {
-        this[msg.command]();
-      } else {
-        console.log(msg);
+        if (typeof msg.data != "undefined") {
+          this[msg.command](msg.data);
+        } else {
+          this[msg.command]();
+        }
       }
+      console.log(msg);
     },
     messageBackground : function(msg) {
-      msg.destination = "background";
-      msg.sender = "content";
-      if (typeof this.sessionid != "undefined") {
-        msg.sessionid = this.sessionid;
-      }
       this.port.postMessage(msg);
     },
     showTooltip : function(evt) {
@@ -54,7 +77,7 @@ var PasswordNinjaContentScript = function(port) {
       }
       dropdown += '</ul></div>';
       var $dropdown = $(dropdown);
-      $dropdown.find('li').on('click', _.bind(function(evt) {
+      $dropdown.on('click', 'li', _.bind(function(evt) {
         evt.preventDefault();
         var selector = this.detectSelector($el);
         var action = $(evt.currentTarget).attr('data-action');
@@ -71,6 +94,14 @@ var PasswordNinjaContentScript = function(port) {
       });
       $container.append($btn, $dropdown);
       $el.after($container);
+    },
+    doAction : function(data) {
+      var $el = $(data.selector);
+      if (data.action === 'click') {
+        $el.click();
+      } else {
+        $el.val(data.action);
+      }
     },
     detectSelector : function($el) {
       //Determines a unique selector for a given webpage element
@@ -111,10 +142,10 @@ var PasswordNinjaContentScript = function(port) {
       }
     }
   };
-  obj.initialize(port);
+  obj.initialize();
   return obj;
 };
 
-chrome.runtime.onConnect.addListener(_.bind(function(port) {
-  var script = new PasswordNinjaContentScript(port);
+$(document).ready(_.bind(function() {
+  var script = new PasswordNinjaContentScript();
 }, this));
