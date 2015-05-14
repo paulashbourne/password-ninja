@@ -1,33 +1,36 @@
 <html>
   <head>
+    <link type="text/css" rel="stylesheet" href="/bootstrap/bootstrap.css">
     <link type="text/css" rel="stylesheet" href="/popup/popup.css">
   </head>
   <body>
-    <div id="learning" class="rowContainer" style="display: block;">
-      <div class="buttonRow">
-        <a href="#" class="popupButton" id="learnChangePassword">
-          <img class="buttonIcon" src="lock.png">
-          <span>Learn Password Change</span>
-        </a>
-      </div>
-      <div class="buttonRow">
-        <a href="#" class="popupButton">
-        <img class="buttonIcon" src="lock.png">
-          <span>Learn Login</span>
-        </a>
-      </div>
-    </div>
-    <div id="learningOptions" class="rowContainer" style="display: block;">
-      <div class="buttonRow">
-        <a href="#" class="popupButton" id="doneLearning">
-          <img class="buttonIcon" src="lock.png">
-          <span>Done Learning</span>
-        </a>
-      </div>
+    <div class="container-fluid">
+      <h2>Password Ninja</h2>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label for="domain" class="col-md-2 control-label">Website Domain</label>
+          <div class="col-md-10">
+            <input type="email" class="form-control" id="domain" placeholder="e.g. facebook.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password" class="col-md-2 control-label">Password</label>
+          <div class="col-md-10">
+            <input type="password" class="form-control" id="password" placeholder="Master Password">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-offset-3 col-md-6">
+            <button id="generate-password" type="button" class="btn btn-primary">Generate Password</button>
+          </div>
+        </div>
+      </form>
+      <span id="generate-result" class="alertMsg"></span> </div>
+      <span id="generate-error" class="alertMsg"></span> </div>
     </div>
     <script src="/lib/jquery.min.js"></script>
+    <script src="/bootstrap/bootstrap.js"></script>
     <script src="/lib/require.js"></script>
-    <script src="/core.js"></script>
     <script src="/popup/popup.js"></script>
   </body>
 </html>
