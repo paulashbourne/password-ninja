@@ -1,3 +1,7 @@
+require(
+    ['underscore', 'api'],
+    function(_, api) {
+
 var BackgroundPage = function() {
   var obj = {
     initialize : function() {
@@ -15,6 +19,7 @@ var BackgroundPage = function() {
           }, _.bind(function(tabs) {
             var tabid = tabs[0].id;
             this.initPopupScript(tabid, port);
+            this.tabs[tabid].tab = tabs[0];
             port.onMessage.addListener(_.bind(this.portListener(tabid, port.name), this));
           }, this));
         }
@@ -25,7 +30,7 @@ var BackgroundPage = function() {
         this.tabs[tabid] = {
           'state' : 'default',
           'ports' : {},
-          'instructions' : [],
+          'instructions' : []
         }
       }
     },
@@ -111,7 +116,8 @@ var BackgroundPage = function() {
     getActiveTab : function(callback) {
     },
     popupFunctions : [
-      "learnPasswordChange"
+      "learnPasswordChange",
+      "doneLearning"
     ],
     learnPasswordChange : function(tabid) {
       if (!("content" in this.tabs[tabid].ports)) {
@@ -119,6 +125,7 @@ var BackgroundPage = function() {
       }
       this.tabs[tabid].state = "learnPasswordChange";
       this.initContentScript(tabid);
+      this.tabs[tabid].instructions = [];
     },
     doPasswordChange : function(tabid) {
       if (!("content" in this.tabs[tabid].ports)) {
@@ -126,18 +133,33 @@ var BackgroundPage = function() {
       }
       this.tabs[tabid].state = "doPasswordChange";
       this.initContentScript(tabid);
-    }
+      this.tabs[tabid].instructions = [];
+    },
     doneLearning : function(tabid) {
-      this.tabs[tabid].state = "default";
-      this.initContentScript(tabid);
+      var tab = this.tabs[tabid];
+      debugger;
+      debugger;
+      //tab.state = "default";
+      //this.initContentScript(tabid);
+      var params = {
+        'instructions' : tab.instructions,
+        'hostname'     : PasswordNinjaLib.getHostname(tab.tab.url),
+        'url'          : tab.tab.url,
+        'type'         : "changePassword"
+      };
+      api.call(
+          'save-instructions',
+          params
+      )
     }
   };
   obj.initialize();
   return obj;
 };
 
-// main
-$(document).ready(function() {
-  var script = new BackgroundPage();
-});
+  // main
+  $(document).ready(function() {
+    var script = new BackgroundPage();
+  });
 
+});

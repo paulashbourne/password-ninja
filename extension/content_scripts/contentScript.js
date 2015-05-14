@@ -26,10 +26,10 @@ var PasswordNinjaContentScript = function() {
     },
     learnPasswordChange : function() {
       this.tooltipOptions = {
-        'username' : 'Enter Username/Email',
-        'new-password' : 'Enter New Password',
-        'old-password' : 'Enter Old Password',
-        'click' : 'Click!'
+        'username'     : 'Enter Username/Email',
+        'new_password' : 'Enter New Password',
+        'password'     : 'Enter Old Password',
+        'click'        : 'Click!'
       };
       this.resetListeners();
     },
@@ -37,7 +37,7 @@ var PasswordNinjaContentScript = function() {
       this.tooltipOptions = {
         'username' : 'Enter Username/Email',
         'password' : 'Enter Password',
-        'click' : 'Click!'
+        'click'    : 'Click!'
       };
       this.resetListeners();
     },

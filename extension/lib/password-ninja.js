@@ -11,6 +11,10 @@ var PasswordNinjaLib = {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
   },
-
+  getHostname: function(url) {
+    parser = document.createElement("a");
+    parser.href = url;
+    return parser.hostname;
+  },
 
 }

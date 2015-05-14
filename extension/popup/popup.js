@@ -19,9 +19,12 @@ require(
     setOptions : function(data) {
       this.$el.html("");
       var options = data.options;
+      console.log(options);
       _.each(options, _.bind(function(option) {
+          console.log(option);
         if (option.type == "div") {
           //do something
+          console.log("do something");
         } else {
           this.$el.append(
             '<div class="buttonRow">' +

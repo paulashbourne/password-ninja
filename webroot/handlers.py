@@ -1,13 +1,24 @@
+from base_handler import BaseHandler
 import tornado.web
-import python
 
-class HomePageHandler(tornado.web.RequestHandler):
+class HomePageHandler(BaseHandler):
+
     def get(self):
-        self.render("templates/home.html")
+        self.render("templates/page/home.html")
 
-class ErrorPageHandler(tornado.web.RequestHandler):
+class ErrorPageHandler(BaseHandler):
+
     def get(self):
-        self.write("Error")
+        self.set_status(404)
+        self.render("templates/page/404.html")
 
-class FacebookAPIHookHandler(tornado.web.RequestHandler):
+    def post(self):
+        self.set_status(404)
+
+class JSTemplateHandler(tornado.web.RequestHandler):
+
+    def get(self, tpl):
+        with open("templates/js/%s" % tpl) as f:
+            return self.write(f.read())
+        event_json = ujson.loads()
 
