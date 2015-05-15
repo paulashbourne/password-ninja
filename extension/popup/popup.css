@@ -1,3 +1,7 @@
 body {
   min-width: 300px;
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+p, h1, h2, h3, h4, h5, h6, label, span {
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
 }

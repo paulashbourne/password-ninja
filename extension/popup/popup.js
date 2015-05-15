@@ -1,6 +1,7 @@
 require(
-    ['/lib/underscore.js', '/lib/backbone.js', '/lib/sha256.js'],
-    function(_, Backbone, sha256) {
+    ['/lib/underscore.js', '/lib/backbone.js', '/lib/sha256.js',
+    '/lib/password-ninja.js'],
+    function(_, Backbone, sha256, _PasswordNinjaLib) {
 
   var PopupView = Backbone.View.extend({
     initialize : function() {
@@ -34,6 +35,11 @@ require(
       this.$('#generate-result').html(msg);
     },
     render : function() {
+      chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+        var url = tabs[0].url;
+        var hostname = PasswordNinjaLib.getHostname(url);
+        $('#domain').val(hostname);
+      });
     }
   });
   var init_page = function() {
