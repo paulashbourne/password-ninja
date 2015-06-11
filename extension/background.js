@@ -1,5 +1,8 @@
+/*
+ * Background script
+ */
 require(
-    ['underscore', 'api'],
+    ['/lib/js/underscore.js', '/lib/api.js'],
     function(_, api) {
 
 var BackgroundPage = function() {
