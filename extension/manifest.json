@@ -2,7 +2,7 @@
   "manifest_version" : 2,
   "name" : "PasswordNinja",
   "description" : "Allows you to securely use a single password for all websites.",
-  "version" : "1.0",
+  "version" : "1.0.1",
 
   "permissions": [
     "tabs"
