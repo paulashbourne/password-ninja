@@ -1,7 +1,7 @@
 require(
     ['/lib/underscore.js', '/lib/backbone.js', '/lib/sha256.js',
     '/lib/password-ninja.js'],
-    function(_, Backbone, sha256, _PasswordNinjaLib) {
+    function(_, Backbone, sha256, PasswordNinjaLib) {
 
   var PopupView = Backbone.View.extend({
     initialize : function() {
