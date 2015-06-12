@@ -11,6 +11,7 @@
     "scripts" : [
       "/lib/jquery.min.js",
       "/lib/require.js",
+      "/lib/underscore.js",
       "background.js"
     ]
   },
@@ -22,10 +23,13 @@
     "matches" : ["*://*/*"],
     "js" : [
       "/lib/jquery.min.js",
-      "/lib/require.js"
+      "/lib/require.js",
+      "/lib/underscore.js",
+      "content.js"
     ],
     "css" : [
     ],
     "all_frames" : true
-  }]
+  }],
+  "web_accessible_resources" : ["lib/*"]
 }

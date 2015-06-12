@@ -1,12 +1,12 @@
 /*
- * Automatically detect elements in the page
+ * Automatically detect password elements in the page
  */
 define(
     ['/lib/underscore.js'],
     function(_) {
 
 var Detect = {
-  function findLoginPasswordInput() {
+  findLoginPasswordInput : function() {
     var regex = /(log|sign)\s*in/i;
     //First, find all visible password inputs
     $pwds = $('input[type="password"]:visible');
@@ -20,7 +20,7 @@ var Detect = {
     do {
       for (var i = 0; i < $pwds.length; i++) {
         $pwd = $($pwds[i]);
-        if (regex.test(getjQueryString($pwd))) {
+        if (regex.test(this.getjQueryString($pwd))) {
           return $pwd;
         }
         $parent = $pwd;
@@ -31,7 +31,7 @@ var Detect = {
           //not this element
           $pwd.splice(i, 1);
           i--;
-        } else if (regex.test(getjQueryString($parent))) {
+        } else if (regex.test(this.getjQueryString($parent))) {
           return $pwd;
         }
       }
@@ -39,11 +39,8 @@ var Detect = {
     } while($pwd.length > 0);
     return null;
   },
-  function getjQueryString($el) {
+  getjQueryString : function($el) {
     return $('<div>').append($el.clone()).html(); 
-  },
-  function findRelatedInputs($input) {
-    $p = $input.parent();
   }
 };
 
