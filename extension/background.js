@@ -92,11 +92,11 @@ var BackgroundPage = function() {
     ],
     contentFunctions : [
     ],
-    fillPassword : function(tabid, password) {
+    fillPassword : function(tabid, data) {
       this.tabs[tabid].ports.content.postMessage({
         'command' : "fillPassword",
         'data' : {
-          'password' : password
+          'password' : data.password
         }
       });
     }
