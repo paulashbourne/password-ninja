@@ -11,7 +11,7 @@ require(
       'click #generate-password' : 'generatePassword'
     },
     generatePassword : function(evt) {
-      var domain = this.$('#domain').val();
+      var domain = this.$('#domain').val().toLowerCase();
       if (domain == "") {
         this.showResult("");
         this.showError("Please enter the domain (e.g. facebook.com)");
